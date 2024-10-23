@@ -1,3 +1,4 @@
+import json
 import logging
 import math
 import time
@@ -39,11 +40,31 @@ class Rabbit:
         self._connection = connection
         self._channel = channel
 
-    async def publish(self, routing_key, data):
-        pass
+    async def publish(self, routing_key, data) -> bool:
+        if not self._connection or not self._channel:
+            await self._connect()
+
+        try:
+            self._queue_declare(routing_key)
+
+            json_data = json.dumps(data)
+            self._channel.basic_publish(exchange="", routing_key=routing_key, body=json_data,
+                                        properties=pika.BasicProperties(content_type="application/json"))
+            logging.info(f"published message: {data} to queue: {routing_key}")
+            return True
+        except Exception as e:
+            logging.error(f"Failed to publish message: {e}")
+            return False
+
+        finally:
+            if self._channel:
+                self._channel.close()
+            if self._connection:
+                self._connection.close()
 
     async def consume(self, routing_key):
-        pass
+        if not self._channel or not self._connection:
+            await self._connect()
 
-    def _queue_declare(self):
-        pass
+    def _queue_declare(self, routing_key):
+        self._channel.queue_declare(queue=routing_key)
