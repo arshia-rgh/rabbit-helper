@@ -1,0 +1,8 @@
+setup.py
+rabbit_helper/__init__.py
+rabbit_helper/rabbit.py
+rabbit_helper.egg-info/PKG-INFO
+rabbit_helper.egg-info/SOURCES.txt
+rabbit_helper.egg-info/dependency_links.txt
+rabbit_helper.egg-info/requires.txt
+rabbit_helper.egg-info/top_level.txt
