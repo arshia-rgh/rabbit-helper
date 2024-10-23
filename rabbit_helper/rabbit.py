@@ -1,6 +1,11 @@
 class Rabbit:
-    def __init__(self, channel):
-        self.channel = channel
+    def __init__(self, rabbit_url):
+        self.rabbit_url = rabbit_url
+        self._connection = None
+        self._channel = None
+
+    async def _connect(self):
+        pass
 
     async def publish(self):
         pass
@@ -8,5 +13,5 @@ class Rabbit:
     async def consume(self):
         pass
 
-    def queue_declare(self):
+    def _queue_declare(self):
         pass
