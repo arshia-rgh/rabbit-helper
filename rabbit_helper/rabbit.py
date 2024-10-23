@@ -56,15 +56,25 @@ class Rabbit:
             logging.error(f"Failed to publish message: {e}")
             return False
 
-        finally:
-            if self._channel:
-                self._channel.close()
-            if self._connection:
-                self._connection.close()
-
-    async def consume(self, routing_key):
+    async def consume(self, routing_key, callback):
         if not self._channel or not self._connection:
             await self._connect()
+        while True:
+            try:
+                self._queue_declare(routing_key)
+
+                self._channel.basic_consume(queue=routing_key, on_message_callback=callback, auto_ack=True)
+                logging.info(f"Started consuming from queue: {routing_key}")
+                self._channel.start_consuming()
+
+            except Exception as e:
+                logging.error(f"Failed to consume message: {e}")
 
     def _queue_declare(self, routing_key):
         self._channel.queue_declare(queue=routing_key)
+
+    def close(self):
+        if self._channel:
+            self._channel.close()
+        if self._connection:
+            self._connection.close()
